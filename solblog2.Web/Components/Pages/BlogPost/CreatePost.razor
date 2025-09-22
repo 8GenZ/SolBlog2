@@ -1,0 +1,36 @@
+﻿@page "/blog/create"
+@using solblog2.Web.Models
+
+<h3>Create New Blog Post</h3>
+
+<EditForm Model="@post" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="title">Title</label>
+        <InputText id="title" class="form-control" @bind-Value="post.Title" />
+    </div>
+
+    <div class="mb-3">
+        <label for="abstract">Abstract</label>
+        <InputTextArea id="abstract" class="form-control" @bind-Value="post.Abstract" />
+    </div>
+
+    <div class="mb-3">
+        <label for="content">Content</label>
+        <InputTextArea id="content" class="form-control" @bind-Value="post.Content" rows="10" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</EditForm>
+
+@code {
+    private BlogPostInput post = new();
+
+    private void HandleValidSubmit()
+    {
+        // TODO: Call API to save post
+    }
+
+}

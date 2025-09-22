@@ -1,0 +1,39 @@
+﻿@* @page "/postDetails/{slug}"
+@using Microsoft.EntityFrameworkCore
+@using SolBlog2.Infrastructure.Data
+@using SolBlog2.Domain.Models
+@inject ApplicationDbContext Db
+
+<h3>@post?.Title</h3>
+
+@if (loading)
+{
+    <p>Loading…</p>
+}
+else if (post is null)
+{
+    <p>Post not found.</p>
+}
+else
+{
+    <p><em>@post.Abstract</em></p>
+    <article style="white-space:pre-wrap">@post.Content</article>
+}
+
+@code {
+    [Parameter] public string slug { get; set; } = string.Empty;
+
+    private BlogPost? post;
+    private bool loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+
+        post = await Db.BlogPosts
+            .Where(p => p.Slug == slug && p.IsPublished && !p.IsDeleted)
+            .FirstOrDefaultAsync();
+
+        loading = false;
+    }
+} *@

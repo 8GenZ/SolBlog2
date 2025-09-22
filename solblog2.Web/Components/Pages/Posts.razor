@@ -1,0 +1,41 @@
+﻿@* @page "/posts"
+@using Microsoft.EntityFrameworkCore
+@using SolBlog2.Infrastructure.Data
+@using SolBlog2.Domain.Models
+@inject ApplicationDbContext Db
+
+<h3>Blog</h3>
+
+@if (posts is null)
+{
+    <p>Loading…</p>
+}
+else if (posts.Count == 0)
+{
+    <p>No posts yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var p in posts)
+        {
+            <li>
+                <a href="@($"/post/{p.Slug}")">@p.Title</a>
+                <div><em>@p.Abstract</em></div>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<BlogPost>? posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await Db.BlogPosts
+            .Where(p => p.IsPublished && !p.IsDeleted)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+}
+ *@
