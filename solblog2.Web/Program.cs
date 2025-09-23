@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using solblog2.Web.Components;
 using solblog2.Web.Components.Account;
-using SolBlog2.Infrastructure.Auth;
+using solblog2.Web.Models;
 using SolBlog2.Domain.Models;
+using SolBlog2.Infrastructure.Auth;
 using SolBlog2.Infrastructure.Data;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,12 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddControllers();          // add this
+builder.Services.AddEndpointsApiExplorer();
+
+// Needed for reading current user inside minimal APIs
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<ApplicationDbContext>(opts =>
     opts.UseSqlite(builder.Configuration.GetConnectionString("Default")
@@ -38,26 +46,23 @@ builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
-        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme; // <-- add
-        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;    // <-- add
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
     })
     .AddIdentityCookies();
+
 builder.Services.AddAuthorization();
-
-
+builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 var app = builder.Build();
 
-
-
-
+// dev-time seeding/migrations
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-    // (Dev-only is fine; keep if you want) apply pending migrations
     await db.Database.MigrateAsync();
 
     if (!await db.BlogPosts.AnyAsync())
@@ -72,7 +77,7 @@ using (var scope = app.Services.CreateScope())
             IsPublished = true
         };
 
-        post.MarkCreated("system"); // sets CreatedAt/CreatedBy
+        post.MarkCreated("system");
 
         db.BlogPosts.Add(post);
         await db.SaveChangesAsync();
@@ -95,9 +100,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
+// static files before components
 app.MapStaticAssets();
+
+
+// Blazor components (once)
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
 app.MapAdditionalIdentityEndpoints();
 

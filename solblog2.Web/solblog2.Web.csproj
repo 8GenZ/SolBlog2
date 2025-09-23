@@ -15,12 +15,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SolBlog2.Domain\SolBlog2.Domain.csproj" />
     <ProjectReference Include="..\SolBlog2.Infrastructure\SolBlog2.Infrastructure.csproj" />
     <ProjectReference Include="..\Solblog2.Application\Solblog2.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Endpoints\" />
   </ItemGroup>
 
 </Project>

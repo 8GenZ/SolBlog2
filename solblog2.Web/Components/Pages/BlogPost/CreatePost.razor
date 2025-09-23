@@ -1,36 +1,84 @@
 ﻿@page "/blog/create"
 @using solblog2.Web.Models
+@using System.Net.Http.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
 
-<h3>Create New Blog Post</h3>
-
-<EditForm Model="@post" OnValidSubmit="HandleValidSubmit">
+        <h3>Create New Blog Post</h3>
+<EditForm Model="@post" OnValidSubmit="HandleValidSubmit" FormName="createPostForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
+    <p class="text-muted">
+        debug → title: @post?.Title ?? "(null)",
+        content length: @(post?.Content?.Length ?? 0)
+    </p>
+
     <div class="mb-3">
         <label for="title">Title</label>
-        <InputText id="title" class="form-control" @bind-Value="post.Title" />
+        <InputText id="title" class="form-control" @bind-Value="post.Title" @bind-Value:event="oninput" />
     </div>
 
     <div class="mb-3">
         <label for="abstract">Abstract</label>
-        <InputTextArea id="abstract" class="form-control" @bind-Value="post.Abstract" />
+        <InputTextArea id="abstract" class="form-control" @bind-Value="post.Abstract" @bind-Value:event="oninput" />
     </div>
 
     <div class="mb-3">
         <label for="content">Content</label>
-        <InputTextArea id="content" class="form-control" @bind-Value="post.Content" rows="10" />
+        <InputTextArea id="content" class="form-control" @bind-Value="post.Content" @bind-Value:event="oninput" rows="10" />
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-</EditForm>
+ </EditForm>
+
+
+
 
 @code {
     private BlogPostInput post = new();
 
-    private void HandleValidSubmit()
+    private bool isSaving;
+    private string? error;
+
+    private sealed record CreateResponse(int Id, string Slug);
+
+    private async Task HandleValidSubmit()
     {
-        // TODO: Call API to save post
+        isSaving = true;
+        error = null;
+
+        try
+        {
+            var resp = await Http.PostAsJsonAsync("/api/blogposts", post);
+            if (resp.IsSuccessStatusCode)
+            {
+                var created = await resp.Content.ReadFromJsonAsync<CreateResponse>();
+                if (created is not null && !string.IsNullOrWhiteSpace(created.Slug))
+                {
+                    Nav.NavigateTo($"/post/{created.Slug}");
+                    return;
+                }
+                error = "Saved, but response was missing data. Love that for us.";
+            }
+            else if (resp.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                error = "You must be logged in to create posts.";
+            }
+            else
+            {
+                var body = await resp.Content.ReadAsStringAsync();
+                error = $"Save failed ({(int)resp.StatusCode}). {body}";
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Unexpected error: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
     }
 
 }
