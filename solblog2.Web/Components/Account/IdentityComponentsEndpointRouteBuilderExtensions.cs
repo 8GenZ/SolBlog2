@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using solblog2.Web.Components.Account.Pages;
-using solblog2.Web.Components.Account.Pages.Manage;
+using SolBlog2.Web.Components.Account.Pages;
+using SolBlog2.Web.Components.Account.Pages.Manage;
 using SolBlog2.Infrastructure.Auth;
 
 namespace Microsoft.AspNetCore.Routing;

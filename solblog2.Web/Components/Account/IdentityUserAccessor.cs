@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using SolBlog2.Infrastructure.Auth;
 
-namespace solblog2.Web.Components.Account;
+namespace SolBlog2.Web.Components.Account;
 
 internal sealed class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
 {

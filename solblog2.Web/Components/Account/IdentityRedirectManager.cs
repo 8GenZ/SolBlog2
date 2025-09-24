@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 
-namespace solblog2.Web.Components.Account;
+namespace SolBlog2.Web.Components.Account;
 
 internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
 {

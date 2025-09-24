@@ -1,4 +1,4 @@
-﻿namespace solblog2.Web.Models
+﻿namespace SolBlog2.Web.Models
 {
 
     public sealed class BlogPostVm

@@ -1,7 +1,10 @@
-﻿@* @page "/posts"
+﻿@page "/posts"
 @using Microsoft.EntityFrameworkCore
-@using SolBlog2.Infrastructure.Data
 @using SolBlog2.Domain.Models
+@using SolBlog2.Infrastructure.Data
+@using SolBlog2.Web
+@using SolBlog2.Web.Components
+@using SolBlog2.Web.Models
 @inject ApplicationDbContext Db
 
 <h3>Blog</h3>
@@ -38,4 +41,3 @@ else
             .ToListAsync();
     }
 }
- *@

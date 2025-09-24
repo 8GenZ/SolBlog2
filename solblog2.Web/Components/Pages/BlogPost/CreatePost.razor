@@ -1,8 +1,11 @@
 ﻿@page "/blog/create"
-@using solblog2.Web.Models
 @using System.Net.Http.Json
+@using SolBlog2.Web
+@using SolBlog2.Web.Components
+@using SolBlog2.Web.Models
 @inject HttpClient Http
 @inject NavigationManager Nav
+@rendermode InteractiveServer
 
         <h3>Create New Blog Post</h3>
 <EditForm Model="@post" OnValidSubmit="HandleValidSubmit" FormName="createPostForm">
@@ -36,12 +39,17 @@
 
 
 @code {
-    private BlogPostInput post = new();
 
+    private SolBlog2.Web.Models.BlogPostInput post = new();
     private bool isSaving;
     private string? error;
 
     private sealed record CreateResponse(int Id, string Slug);
+
+    protected override void OnInitialized(){
+         if (Http.BaseAddress is null)
+            Http.BaseAddress = new Uri(Nav.BaseUri);
+    }
 
     private async Task HandleValidSubmit()
     {
@@ -50,8 +58,7 @@
 
         try
         {
-            var resp = await Http.PostAsJsonAsync("/api/blogposts", post);
-            if (resp.IsSuccessStatusCode)
+            var resp = await Http.PostAsJsonAsync("api/BlogPosts", post); if (resp.IsSuccessStatusCode)
             {
                 var created = await resp.Content.ReadFromJsonAsync<CreateResponse>();
                 if (created is not null && !string.IsNullOrWhiteSpace(created.Slug))

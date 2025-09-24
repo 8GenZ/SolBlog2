@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Solblog2.Application\Solblog2.Application.csproj" />
+    <ProjectReference Include="..\Solblog2.Application\SolBlog2.Application.csproj" />
     <ProjectReference Include="..\SolBlog2.Domain\SolBlog2.Domain.csproj" />
   </ItemGroup>
 
@@ -26,6 +26,10 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+	  <AssemblyName>SolBlog2.Infrastructure</AssemblyName>
+	  <RootNamespace>SolBlog2.Infrastructure</RootNamespace>
+
   </PropertyGroup>
 
 </Project>

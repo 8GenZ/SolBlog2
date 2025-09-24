@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using solblog2.Web.Components;
-using solblog2.Web.Components.Account;
-using solblog2.Web.Models;
+using SolBlog2.Web.Components;
+using SolBlog2.Web.Components.Account;
+using SolBlog2.Web.Models;
 using SolBlog2.Domain.Models;
 using SolBlog2.Infrastructure.Auth;
 using SolBlog2.Infrastructure.Data;
@@ -100,6 +100,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseAntiforgery();
 
+app.MapControllers(); 
 // static files before components
 app.MapStaticAssets();
 
