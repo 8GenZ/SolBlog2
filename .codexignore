@@ -1,0 +1,28 @@
+powershell -NoProfile -Command ^
+"@'
+# Build outputs
+**/bin/
+**/obj/
+**/dist/
+**/artifacts/
+
+# Frontend deps & bundles
+**/node_modules/
+**/wwwroot/**/*.map
+**/wwwroot/**/bundle*.*
+**/wwwroot/**/generated/*
+
+# IDE/system noise
+.vs/
+.vscode/
+.DS_Store
+
+# Media and blobs
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.pdf
+**/*.zip
+'@ | Set-Content -Encoding UTF8 .codexignore"
