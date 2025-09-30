@@ -9,24 +9,19 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <p class="text-muted">
-        debug → title: @post?.Title ?? "(null)",
-        content length: @(post?.Content?.Length ?? 0)
-    </p>
-
     <div class="mb-3">
         <label for="title">Title</label>
-        <InputText id="title" class="form-control" @bind-Value="post.Title" @bind-Value:event="oninput" />
+        <input id="title" class="form-control" @bind="post.Title" @bind:event="oninput" />
     </div>
 
     <div class="mb-3">
         <label for="abstract">Abstract</label>
-        <InputTextArea id="abstract" class="form-control" @bind-Value="post.Abstract" @bind-Value:event="oninput" />
+        <textarea id="abstract" class="form-control" @bind="post.Abstract" @bind:event="oninput"></textarea>
     </div>
 
     <div class="mb-3">
         <label for="content">Content</label>
-        <InputTextArea id="content" class="form-control" @bind-Value="post.Content" @bind-Value:event="oninput" rows="10" />
+        <textarea id="content" class="form-control" rows="10" @bind="post.Content" @bind:event="oninput"></textarea>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
@@ -37,7 +32,7 @@
 
 @code {
 
-    private SolBlog2.Web.Models.BlogPostInput post = new();
+    private BlogPostInput post = new();
     private bool isSaving;
     private string? error;
 

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using SolBlog2.Web.Components;
 using SolBlog2.Web.Components.Account;
+using Microsoft.AspNetCore.Components.Server;
 using SolBlog2.Web.Models;
 using SolBlog2.Domain.Models;
 using SolBlog2.Infrastructure.Auth;
@@ -26,6 +27,7 @@ builder.Services.AddEndpointsApiExplorer();
 // Needed for reading current user inside minimal APIs
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.Configure<CircuitOptions>(o => o.DetailedErrors = true);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -87,6 +89,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseMigrationsEndPoint();
 }
 else
