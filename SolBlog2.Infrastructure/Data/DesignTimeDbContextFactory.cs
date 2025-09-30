@@ -1,21 +1,37 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+
+using System.IO;
 
 namespace SolBlog2.Infrastructure.Data
 {
-    public sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+    // Don't seal unless you really want to; EF doesn't care.
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
     {
         public ApplicationDbContext CreateDbContext(string[] args)
         {
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlite("Data Source=blog.db")
-                .Options;
-            return new ApplicationDbContext(options);
+            // Build configuration so the factory uses the same settings as runtime
+            var webDir = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "SolBlog2.Web"));
+
+            var cfg = new ConfigurationBuilder()
+                .SetBasePath(webDir)
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddJsonFile($"appsettings.Development.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var cs = cfg.GetConnectionString("DefaultConnection")
+                     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection not found.");
+
+            var builder = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseNpgsql(cs, npgsql =>
+                {
+                    // Point migrations at the project that contains them (usually Infrastructure)
+                    npgsql.MigrationsAssembly("SolBlog2.Infrastructure");
+                });
+
+            return new ApplicationDbContext(builder.Options);
         }
     }
 }

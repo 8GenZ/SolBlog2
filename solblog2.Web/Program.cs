@@ -26,9 +26,9 @@ builder.Services.AddEndpointsApiExplorer();
 // Needed for reading current user inside minimal APIs
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddDbContext<ApplicationDbContext>(opts =>
-    opts.UseSqlite(builder.Configuration.GetConnectionString("Default")
-                   ?? "Data Source=app.db"));
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>

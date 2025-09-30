@@ -1,11 +1,8 @@
 ﻿@page "/blog/create"
-@using System.Net.Http.Json
-@using SolBlog2.Web
-@using SolBlog2.Web.Components
+@rendermode InteractiveServer
 @using SolBlog2.Web.Models
 @inject HttpClient Http
 @inject NavigationManager Nav
-@rendermode InteractiveServer
 
         <h3>Create New Blog Post</h3>
 <EditForm Model="@post" OnValidSubmit="HandleValidSubmit" FormName="createPostForm">
