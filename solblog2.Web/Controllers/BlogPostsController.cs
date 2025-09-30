@@ -48,14 +48,20 @@ namespace SolBlog2.Web.Controllers
         // PUT: api/BlogPosts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBlogPost(int id, BlogPost blogPost)
+        public async Task<IActionResult> PutBlogPost(int id, [FromBody] BlogPostInput input)
         {
-            if (id != blogPost.Id)
+            var blogPost = await _context.BlogPosts.FindAsync(id);
+            if (blogPost == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(blogPost).State = EntityState.Modified;
+            // Update allowed fields
+            blogPost.Title = input.Title;
+            blogPost.Abstract = input.Abstract ?? string.Empty;
+            blogPost.Content = input.Content;
+            blogPost.IsPublished = input.IsPublished;
+            blogPost.MarkUpdated(User?.Identity?.Name ?? "system");
 
             try
             {
@@ -89,7 +95,7 @@ namespace SolBlog2.Web.Controllers
                 Content = input.Content,
                 Slug = ToSlug(input.Title),
                 AuthorId = userId,
-                IsPublished = true,
+                IsPublished = input.IsPublished,
                 IsDeleted = false
             };
             entity.Slug = await GenerateUniqueSlugAsync(input.Title, db);

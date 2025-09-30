@@ -1,0 +1,119 @@
+@page "/blog/edit/{id:int}"
+@rendermode InteractiveServer
+@using SolBlog2.Web.Models
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<h3>Edit Blog Post</h3>
+
+@if (loading)
+{
+    <p>Loading…</p>
+}
+else if (error is not null)
+{
+    <div class="alert alert-danger">@error</div>
+}
+else
+{
+    <EditForm Model="@post" OnValidSubmit="HandleValidSubmit" FormName="editPostForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label for="title">Title</label>
+            <input id="title" class="form-control" @bind="post.Title" @bind:event="oninput" />
+        </div>
+
+        <div class="mb-3">
+            <label for="abstract">Abstract</label>
+            <textarea id="abstract" class="form-control" @bind="post.Abstract" @bind:event="oninput"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="content">Content</label>
+            <textarea id="content" class="form-control" rows="10" @bind="post.Content" @bind:event="oninput"></textarea>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="isPublished" @bind="post.IsPublished" />
+            <label class="form-check-label" for="isPublished">Publish immediately?</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@isSaving">Save Changes</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int id { get; set; }
+    private BlogPostInput post = new();
+    private bool isSaving;
+    private bool loading = true;
+    private string? error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Http.BaseAddress is null)
+            Http.BaseAddress = new Uri(Nav.BaseUri);
+
+        try
+        {
+            var resp = await Http.GetAsync($"api/BlogPosts/{id}");
+            if (resp.IsSuccessStatusCode)
+            {
+                var blog = await resp.Content.ReadFromJsonAsync<BlogPostVm>();
+                if (blog is not null)
+                {
+                    post = new BlogPostInput
+                    {
+                        Title = blog.Title,
+                        Abstract = blog.Abstract,
+                        Content = blog.Content ?? string.Empty,
+                        IsPublished = blog.IsPublished
+                    };
+                }
+                else
+                {
+                    error = "Blog post not found.";
+                }
+            }
+            else
+            {
+                error = $"Failed to load post: {resp.ReasonPhrase}";
+            }
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        loading = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        isSaving = true;
+        error = null;
+        try
+        {
+            var resp = await Http.PutAsJsonAsync($"api/BlogPosts/{id}", post);
+            if (resp.IsSuccessStatusCode)
+            {
+                Nav.NavigateTo("/posts");
+                return;
+            }
+            else
+            {
+                var body = await resp.Content.ReadAsStringAsync();
+                error = $"Save failed ({(int)resp.StatusCode}). {body}";
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Unexpected error: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

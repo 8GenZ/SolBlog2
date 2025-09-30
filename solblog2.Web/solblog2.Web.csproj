@@ -29,8 +29,4 @@
     <ProjectReference Include="..\Solblog2.Application\SolBlog2.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Endpoints\" />
-  </ItemGroup>
-
 </Project>

@@ -9,35 +9,73 @@
 
 <h3>Blog</h3>
 
-@if (posts is null)
+@if (publishedPosts is null || unpublishedPosts is null)
 {
     <p>Loading…</p>
 }
-else if (posts.Count == 0)
-{
-    <p>No posts yet.</p>
-}
 else
 {
-    <ul>
-        @foreach (var p in posts)
-        {
-            <li>
-                <a href="@($"/post/{p.Slug}")">@p.Title</a>
-                <div><em>@p.Abstract</em></div>
-            </li>
-        }
-    </ul>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Published Posts</h4>
+            @if (publishedPosts.Count == 0)
+            {
+                <p>No published posts yet.</p>
+            }
+            else
+            {
+                <ul class="list-unstyled">
+                    @foreach (var p in publishedPosts)
+                    {
+                        <li class="mb-3">
+                            <a href="@($"/postDetails/{p.Slug}")">@p.Title</a>
+                            <div><em>@p.Abstract</em></div>
+                            <small class="text-muted">Created: @p.CreatedAt.ToString("MMM dd, yyyy")</small>
+                            <br />
+                            <a class="btn btn-sm btn-secondary mt-1" href="@($"/blog/edit/{p.Id}")">Edit</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        
+        <div class="col-md-6">
+            <h4>Drafts</h4>
+            @if (unpublishedPosts.Count == 0)
+            {
+                <p>No drafts available.</p>
+            }
+            else
+            {
+                <ul class="list-unstyled">
+                    @foreach (var p in unpublishedPosts)
+                    {
+                        <li class="mb-3">
+                            <a href="@($"/postDetails/{p.Slug}")">@p.Title</a>
+                            <div><em>@p.Abstract</em></div>
+                            <small class="text-muted">Created: @p.CreatedAt.ToString("MMM dd, yyyy")</small>
+                            <br />
+                            <a class="btn btn-sm btn-secondary mt-1" href="@($"/blog/edit/{p.Id}")">Edit</a>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
 }
 
 @code {
-    private List<BlogPost>? posts;
+    private List<BlogPost>? publishedPosts;
+    private List<BlogPost>? unpublishedPosts;
 
     protected override async Task OnInitializedAsync()
     {
-        posts = await Db.BlogPosts
-            .Where(p => p.IsPublished && !p.IsDeleted)
+        var allPosts = await Db.BlogPosts
+            .Where(p => !p.IsDeleted)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+
+        publishedPosts = allPosts.Where(p => p.IsPublished).ToList();
+        unpublishedPosts = allPosts.Where(p => !p.IsPublished).ToList();
     }
 }

@@ -9,5 +9,6 @@
         public string Content { get; set; } = "";
         public string Slug { get; set; } = "";
         public DateTimeOffset CreatedAt { get; set; }
+        public bool IsPublished { get; set; }
     }
 }

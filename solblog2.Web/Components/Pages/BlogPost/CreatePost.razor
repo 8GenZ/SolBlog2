@@ -4,7 +4,7 @@
 @inject HttpClient Http
 @inject NavigationManager Nav
 
-        <h3>Create New Blog Post</h3>
+<h3>Create New Blog Post</h3>
 <EditForm Model="@post" OnValidSubmit="HandleValidSubmit" FormName="createPostForm">
     <DataAnnotationsValidator />
     <ValidationSummary />
@@ -24,22 +24,24 @@
         <textarea id="content" class="form-control" rows="10" @bind="post.Content" @bind:event="oninput"></textarea>
     </div>
 
+    <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="isPublished" @bind="post.IsPublished" />
+        <label class="form-check-label" for="isPublished">Publish immediately?</label>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
- </EditForm>
-
-
-
+</EditForm>
 
 @code {
-
     private BlogPostInput post = new();
     private bool isSaving;
     private string? error;
 
     private sealed record CreateResponse(int Id, string Slug);
 
-    protected override void OnInitialized(){
-         if (Http.BaseAddress is null)
+    protected override void OnInitialized()
+    {
+        if (Http.BaseAddress is null)
             Http.BaseAddress = new Uri(Nav.BaseUri);
     }
 
@@ -50,12 +52,13 @@
 
         try
         {
-            var resp = await Http.PostAsJsonAsync("api/BlogPosts", post); if (resp.IsSuccessStatusCode)
+            var resp = await Http.PostAsJsonAsync("api/BlogPosts", post);
+            if (resp.IsSuccessStatusCode)
             {
                 var created = await resp.Content.ReadFromJsonAsync<CreateResponse>();
                 if (created is not null && !string.IsNullOrWhiteSpace(created.Slug))
                 {
-                    Nav.NavigateTo($"/post/{created.Slug}");
+                    Nav.NavigateTo($"/postDetails/{created.Slug}");
                     return;
                 }
                 error = "Saved, but response was missing data. Love that for us.";
@@ -79,5 +82,4 @@
             isSaving = false;
         }
     }
-
 }
